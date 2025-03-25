@@ -1,0 +1,37 @@
+name: egoru-web
+
+services:
+  backend:
+    image: egoru-backend
+    hostname: egoru-backend
+#    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    command: bash -c "python -m app.main"
+    networks:
+      - egoru-web-network
+    env_file:
+      - "./backend/.env"
+
+  gateway:
+    image: egoru-frontend
+#    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.d:/etc/nginx/conf.d
+    networks:
+      - egoru-web-network
+    env_file:
+      - "./frontend/.env"
+
+networks:
+  egoru-web-network:
+    name: egoru-web-network
+    driver: bridge
